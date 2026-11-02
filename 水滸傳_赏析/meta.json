@@ -1,0 +1,19 @@
+{
+  "title": "水滸傳",
+  "source": "/home/wei/.claude/skills/character-appreciation-workspace/iteration-1/shuihu-linchong-full/with_skill/outputs/shuihu.txt",
+  "encoding": "utf-8",
+  "script": "繁体",
+  "quote_style": "「」为主",
+  "total_chars": 521453,
+  "chapters": 72,
+  "first_chapter": "（正文前）",
+  "last_chapter": "第七十回　忠義堂石碣受天文　梁山泊英雄驚惡夢",
+  "volumes": [],
+  "split_mode": "heading",
+  "hard_wrap_fixed": true,
+  "warnings": [
+    "已去除古登堡计划版权页（保留第 28–16944 行）",
+    "检测到硬换行（行宽约 74），已按缩进/短行还原段落",
+    "原文为繁体：别名、检索词、引文都要用繁体字形"
+  ]
+}
