@@ -57,5 +57,5 @@ python ~/.claude/skills/youtube-publish/scripts/upload_youtube.py out/youtube/me
 
 ## 和其他技能的关系
 
-- 视频本身用 **xinghuo-style-video** 制作（含 Instagram 竖版 Reels 导出）。
+- 视频本身用 **xinghuo-style-video** 制作；Instagram 竖版用 **instagram-reels** 导出。
 - 想先发到自己邮箱看效果，用 **gmail-send**。

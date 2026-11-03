@@ -1,105 +1,88 @@
 ---
 name: xinghuo-style-video
-description: 用 Python/pycairo 代码生成"星火风格"的电影感科普 / 历史视频（发 YouTube 正片和 Instagram Reels 竖版）：真实历史图像（壁画、手稿、版画、老照片、NASA 影像）做 Ken Burns 推拉，博物馆长廊推镜，蓝图原理图，展品卡片，卫星地图，Byrne 风格证明，换装扮演历史人物的 Claude 角色，电影式转场，无背景音乐只有合成音效，遮幅 + 胶片颗粒 + 字幕。只要用户想做（或改）一个由代码生成的讲解视频、科普动画、历史 / 科学 / 技术 / 人物 / 发明 / 文明主题的短片，提到"YouTube""ins / Instagram""Reels""Shorts""做个视频""8 分钟视频""Claude 形象""像星火那样""电影感""纪录片风格""历史感""运镜转场""渲染 MP4"，或者要在 science_history_video / ai_relay_video 这类项目上继续做，都应使用本技能——即使用户没说"星火"两个字。Use for any code-generated cinematic explainer / documentary-style video with the Claude mascot.
+description: 用 Python/pycairo 代码制作风格统一的电影感讲解视频——以《星火：人类科学简史》确立的审美与质量为标准：真实历史图像 / 实物照片为主视觉、缓慢的电影式运镜、有理由的转场、克制而高密度的信息面板、会探索会扮演的 Claude 角色、第一人称字幕叙事、无背景音乐只有分层音效、遮幅与胶片质感。每部新片都按自己的内容重新设计结构、镜头和素材，《星火》只作参考不照搬。用户想做 / 改一个代码生成的科普、历史、科学、技术、人物、发明、文明主题视频，提到"做个视频""8 分钟视频""Claude 形象""像星火那样""同样的风格""电影感""纪录片风格""历史感""运镜转场"，或要在 science_history_video 这类项目上继续做时，都使用本技能。导出与发布另有技能：instagram-reels、youtube-publish、gmail-send。
 ---
 
-# 星火风格视频
+# 星火风格：统一的审美，原创的每一部
 
-这套风格来自《星火：人类科学简史》（8 分钟，480p，`/home/wei/csy/science_history_video`）。用户对它的评价是
-"非常非常好""无敌了"，特别喜欢：**史前壁画、法拉第讲座这类重要历史画面的插图风格**、厚重的历史感和氛围感、
-运镜与转场的审美、叙事手段、信息密度与画面帧、**只有音效没有背景音乐**、Claude 的动作表情、素材与构图方式。
-以后的视频都按这个标准做。本技能把它固定成：一个可复制的引擎 + 89 张已授权的历史图像 + 场景模板 + 一套审美规则。
+《星火：人类科学简史》（`/home/wei/csy/science_history_video`）是用户非常满意的一部片：史前壁画、法拉第讲座这类
+历史画面的质感，运镜与转场的审美，叙事手段，信息密度与画面，只有音效没有音乐，Claude 的动作表情，素材与构图——
+用户希望**以后的视频都保持这种风格和品位**。
 
-## 什么时候读哪份参考
+但用户同样明确：**以后做其他视频不是照搬，只是参考。** 本技能固定的是"怎么做才好"，不是"做成什么样"。
+新片的故事、结构、镜头、素材都从它自己的内容里长出来；《星火》是一本可以翻阅的范例，不是一个往里填字的模板。
+
+## 必须保持一致的（风格基因）
+
+- **主视觉是真的东西**：真实的历史图像、文物、手稿、老照片、实物照片、卫星影像；没有授权的真图就画示意图并注明，绝不伪造。
+- **电影质感**：遮幅黑边、胶片颗粒、暗角、有方向的光；画面永远在缓慢运动；元素淡入、由虚到实，不弹跳不飞入。
+- **转场有理由**：像剪辑而不像翻页；光、纸、电、冲进细节……转场来自画面内容，相邻不重复。
+- **信息密、版面松**：每个镜头一个主视觉 + 至多一个面板；讲"怎么做到 / 怎么证明 / 数字 / 用在哪"，不罗列名字。
+- **Claude 在场**：第一人称"我"在探索；以参观者、扮演者或第一视角出场；用场景光把卡通角色融进真实画面。
+- **声音**：没有背景音乐、没有人声；环境底不断、动作音有来源、重音留给大事件；−16 LUFS。
+- **克制的排版**：宋体系、暖白 + 金色强调、出处字幕在左下、面板在右侧。
+- **严谨**：每个数字和年份有出处，有争议就照实写；每张图标明出处和授权。
+- **质量线**：不用火柴人；地图不手绘；科技内容讲到原理、证明、数字和应用；一屏一个重点。
+
+## 每部片重新设计的（不要照搬）
+
+- **结构**：是否分章、分几段、有没有序章 / 尾声、有没有"关键词"——由题材决定。星火的"8 章 + 8 个方法收成一只手"是它自己的构思。
+- **镜头与构图**：从 `references/style-bible.md` 的构图词汇里按内容挑，或者发明新的；不要每段都套同一组镜头。
+- **开场钩子和结尾余味**：为这部片单独想；不要复用星火的星图、手印、篝火。
+- **调色**：按本片的时代 / 题材定（同样的原则：真实质感 + 统一的强调色）。
+- **素材**：为本片的题材去找图（见 `references/archive-library.md` 的流程）；现有 89 张是为科学史找的，题材重合时才用。
+- **转场和音效的具体选择**：根据本片的画面设计，而不是沿用星火的转场表和音效表。
+
+## 怎么用《星火》做参考
+
+- 想知道"某种效果怎么实现"（展厅推镜、蓝图动画、卫星地图、证明拼图、第一视角），翻 `examples/xinghuo/scenes/` 对应的函数学写法。
+- 想知道"做到什么程度才算好"，看 `examples/xinghuo/README.md` 的分镜表和事实出处表。
+- 不要复制它的分镜顺序、字幕、镜头组合或素材到新片；借的是手法和标准，不是内容。
+
+## 参考文档
 
 | 要做的事 | 读 |
 |---|---|
-| 定画面：颜色、字体、版式、时代调色、十三种构图 | `references/style-bible.md` |
-| 定运镜和转场（章间 / 章内，各用在哪） | `references/camera-and-transitions.md` |
-| 写分镜和字幕、控制信息密度、讲证明 / 原理 | `references/narrative-and-density.md` |
-| 配音效（三层结构、场景对照表、检查静音） | `references/sound-design.md` |
-| 找图、核对授权、看现有 89 张图各适合干什么 | `references/archive-library.md` |
-| Claude 怎么出场、表情 / 动作 / 服装 / 道具 | `references/claude-character.md` |
-| 函数签名、场景模块约定、渲染命令、**踩过的坑** | `references/engine-api.md` |
-| 发布：Instagram 竖版 Reels 怎么切；YouTube / 邮件交给哪个技能 | `references/publishing.md` |
-| 看完整实现（每种构图都有现成代码） | `examples/xinghuo/scenes/*.py` 和 `examples/xinghuo/README.md` |
+| 画面：颜色、字体、版式、调色原则、构图词汇 | `references/style-bible.md` |
+| 运镜与转场的语法（各适合什么情境） | `references/camera-and-transitions.md` |
+| 叙事、字幕写法、信息密度、讲证明 / 原理 | `references/narrative-and-density.md` |
+| 音效的三层结构与选择原则 | `references/sound-design.md` |
+| 找图、授权、现有素材清单 | `references/archive-library.md` |
+| Claude 的出场方式、表情、动作、服装 | `references/claude-character.md` |
+| 引擎函数、场景模块约定、渲染命令、**踩过的坑** | `references/engine-api.md` |
 
-开工前至少读 style-bible、camera-and-transitions、narrative-and-density 三份；写到具体镜头时再翻对应示例。
+开工前至少读 style-bible、camera-and-transitions、narrative-and-density。
 
 ## 默认规格（用户没另说就照此）
 
-- 30fps；预览默认 **480p**（854×480）；**上传 YouTube / Instagram 用 1080p**（`--res 1080`）；H.264 + AAC，`+faststart`。
-- 发布平台是 **YouTube（16:9 正片）和 Instagram（9:16 竖版 Reels）**，不是 B 站或视频号。
-- 2.2:1 遮幅黑边，字幕烧在下黑边里，另出 SRT；胶片颗粒 0.07、暗角。
-- **没有人声旁白、没有背景音乐**，只有音效和环境声，响度 −16 LUFS。
-- Claude 第一人称（"我"），叫它 Claude（不叫"小橙"）。
-- 画面里的历史图像只用公有领域 / CC0 / CC BY，每张标出处。
+30fps；预览 480p，上传平台用 1080p（`--res 1080`）；2.2:1 遮幅，字幕烧在下黑边并另出 SRT；无人声、无背景音乐；
+Claude 叫 Claude（不叫"小橙"）；图像只用公有领域 / CC0 / CC BY。
 
-## 工作流程
+## 流程
 
-### 1. 定题与大纲
-- 弄清主题、时长、受众、分辨率。时长按"序章 12–18 秒 + 每章 40–70 秒 + 尾声 16–26 秒"分配。
-- 列章节：每章一个两字**关键词**（尾声收拢它们），每章写 5–6 个节拍：开场图 → 人 / 时 / 地 → **怎么做到 / 怎么证明** → 数字 → **应用落地** → 交棒。
-- 事实先查清（WebSearch），数字、年份、引语都要有出处；不确定的写"约 / 一说 / 常被认为"。
-
-### 2. 建项目
-```bash
-python ~/.claude/skills/xinghuo-style-video/scripts/new_project.py <目标目录> --title "片名：副标题" --slug <拼音> \
-    --minutes 8 --chapters "章1,章2,…" --keys "观察,记录,…" --eras "年代1,年代2,…"
-cd <目标目录> && bash setup_env.sh        # 或复用现有 venv：/home/wei/csy/ai_relay_video/.venv/bin/python
-python check.py --quick                   # 骨架应直接通过
-```
-生成的每章骨架已经演示了五种常用构图（展厅推镜 → 档案推拉 + 面板 → 蓝图原理 → 展品卡片 → 卫星地图），
-带好了 SHOTS / TRANS / sfx。要对照完整成片时用 `--example` 复制整部《星火》。
-
-### 3. 找素材
-先在 `references/archive-library.md` 的清单里找现成的；不够就用 `scripts/commons_search.py` 搜 Wikimedia Commons，
-登记到项目的 `tools/fetch_assets.py` 再下载。**新图先拼联系表看一眼内容对不对**，再定裁切。没有可用授权的真图时，
-画示意图并注明"示意"，不要编造"历史图像"。
-
-### 4. 逐章写场景
-- 一个镜头 3–6 秒，一章 8–14 个镜头；镜头函数挂在 `SHOTS`，镜头间转场写 `TRANS`（相邻不重复，一章至少三种）。
-- 每个镜头：一个主视觉（真实图像或动画）+ 最多一个信息面板（3–4 行）+ 出处字幕；留白 ≥ 40%。
-- 画面永远在缓慢运动（推拉、横移、地图飞行），元素淡入上浮，不弹跳、不飞入。
-- Claude 每章至少出场一次（参观者 / 扮演者 / 第一视角），用 `lit()` 染上场景光。
-- 字幕一句一个事实、带数字，≤ 8 字 / 秒；`{}` 高亮一个关键词。
-- 音效三层：环境底不断（不留静音）、动作音对齐画面、重音留给大事件。
-
-### 5. 自查（每章写完都做）
-```bash
-python check.py --quick
-python render.py --still <这一章里 12–18 个关键时间点>
-python ~/.claude/skills/xinghuo-style-video/scripts/contact_sheet.py sheet.jpg out/stills/t*.png
-```
-用 Read 看联系表，逐张找：文字压到主体 / 人脸、字卡和画框重叠、缺字方块、被黑边切掉的标题、画面空洞或太挤、
-转场前后跳动、Claude 被字幕或面板挡住。发现就改，改完再出图确认。
-
-### 6. 成片与交付
-- 完整渲染放后台：`python render.py`（8 分钟约 2–3 分钟）。完成后：
-  - 查静音：`ffmpeg -i out/soundtrack.wav -af silencedetect=noise=-50dB:d=0.8 -f null -` 无输出；响度约 −16 LUFS。
-  - 出全片联系表：`contact_sheet.py sheet.jpg --video out/<slug>_480p.mp4 --every 16`，最后看一遍整体。
-- 更新项目 README：分镜表、"片中事实与说法"（说法 | 依据）、图像来源。
-- 发布物料（见 `references/publishing.md`）：`python render.py --res 1080` 出上传版；
-  `scripts/export_reels.py --chapter N` 出 Instagram 竖版片段；YouTube 的上传物料与上传交给 **youtube-publish** 技能。
-- 发到邮箱看效果交给 **gmail-send** 技能（先 `python render.py --grain 0` 出无颗粒版，它会压到 25 MB 以内再发）。
-  **提交 git、推送、发邮件、上传 YouTube 都只在用户要求时做。**
-
-## 质量线（用户明确否定过的东西）
-
-第一版《星火》被打回过，原因是：人物成了火柴人；信息密度低，几何原本一笔带过；背景不好看、没有壁画的厚重感；
-蒸汽机介绍简陋；世界地图像手绘草图；电气时代画面简陋、没有讲清电气革命的产物；相对论没讲怎么被证明、有什么应用；
-整体可观赏性低。所以：
-- 人物 = 真实肖像 / 照片，或换装的 Claude；**绝不用火柴人**。
-- 科技内容必须具体：原理（蓝图动画）+ 证明（实验 / 推导）+ 数字 + 应用落地 + 真实器物照片。
-- 地图 = 卫星影像 + 真实地理数据。
-- 信息多但不挤：一屏一个重点，布局均匀。
-- 运镜流畅，转场多样且有理由，像电影不像 PPT。
+1. **定题**：主题、时长、受众、分辨率。把题材里最有画面感、最能讲清"为什么"的几件事找出来。
+2. **研究**：查清事实与数字（WebSearch），记下出处；同时想清楚每件事**能用什么真实图像**来讲。
+3. **设计分镜（先于代码）**：在项目 README 的分镜表里写：每段讲什么 → 哪些镜头 → 每个镜头的主视觉、构图、运镜 →
+   镜头间转场及理由 → 声音。写完自查：是否每段都有真实图像、原理 / 证明、数字、应用；构图是否有变化；
+   Claude 是否在场；有没有不自觉地套用星火的结构。
+4. **建项目**：
+   ```bash
+   python ~/.claude/skills/xinghuo-style-video/scripts/new_project.py <目录> --title "片名" --slug <拼音> \
+       --minutes 6 --sections "段1,段2,段3" [--chapter-cards] [--no-prologue] [--no-epilogue]
+   cd <目录> && bash setup_env.sh    # 或复用现有 venv：/home/wei/csy/ai_relay_video/.venv/bin/python
+   ```
+   生成的只是引擎 + 能渲染的空白占位场景（和一张空白分镜表），没有任何预设镜头。
+5. **找素材**：用 `scripts/commons_search.py` 搜，登记到 `tools/fetch_assets.py` 下载；新图先拼联系表看内容对不对再定裁切。
+6. **逐段实现**：按分镜写 `SHOTS` / `TRANS` / `VO` / `SUPERS` / `sfx()`；需要的效果在引擎里没有就写新的（好的新手法确认稳定后同步回 `engine/` 并补进参考文档）。
+7. **自查（每段都做）**：`python check.py --quick` → `python render.py --still <关键时间点>` →
+   `scripts/contact_sheet.py` 拼图后用 Read 逐张看：文字压主体、字卡与画面打架、缺字方块、被黑边切掉、空洞或拥挤、转场跳动、Claude 被挡。
+8. **成片**：后台 `python render.py`；查静音（`silencedetect` 无输出）、响度、全片联系表；更新 README（分镜、事实出处、图像来源）。
+9. **交付**：发邮箱用 **gmail-send**；Instagram 竖版用 **instagram-reels**；YouTube 物料与上传用 **youtube-publish**。
+   提交 git、推送、发邮件、上传都只在用户要求时做。
 
 ## 资源
 
-- `engine/`：引擎快照（aivid、mascot、render.py、check.py、tools、assets）。新项目由 `new_project.py` 复制，**不要直接在这里改**；
-  若在某个项目里改进了引擎（新转场、新构图、新音效），确认稳定后同步回 `engine/`，并在对应参考文档里补一行。
-- `templates/`：序章、章节、尾声模板（`__占位符__` 由脚手架替换）。
-- `examples/xinghuo/`：《星火》全部 10 个场景源码 + README（分镜、事实出处表）。
-- `scripts/`：`new_project.py` 建项目、`commons_search.py` 搜图、`contact_sheet.py` 联系表、`export_reels.py` Instagram 竖版。
-- 相关技能：**gmail-send**（发邮箱）、**youtube-publish**（YouTube 物料与上传）。
+- `engine/`：引擎快照（aivid、mascot、render.py、check.py、tools、地图数据、89 张已授权图像）。新项目由脚手架复制，不在这里直接改。
+- `templates/stub_template.py`：空白占位场景。
+- `examples/xinghuo/`：《星火》全部场景源码与 README（参考）。
+- `scripts/`：`new_project.py` 建项目、`commons_search.py` 搜图、`contact_sheet.py` 联系表（图片或整片抽帧）。
