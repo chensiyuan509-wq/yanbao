@@ -1,0 +1,5 @@
+# pycairo 建议用系统包：sudo apt install python3-cairo（虚拟环境需加 --system-site-packages）
+# 若要在虚拟环境里直接 pip install pycairo，需先 sudo apt install libcairo2-dev pkg-config
+numpy>=1.22
+imageio-ffmpeg>=0.4.9
+Pillow>=9.0          # 只在 render.py --sheet 预览时用到

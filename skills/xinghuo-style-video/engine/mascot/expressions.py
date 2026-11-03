@@ -1,0 +1,106 @@
+"""表情表（声明式）：眼睛 / 眉毛 / 嘴 / 腮红 / 默认特效。
+
+前 11 个与 assets/image.jpg 一一对应，其余为扩展。新增表情只需在这里加一行。
+眼睛种类见 face.draw_eye；眉毛见 BROWS；嘴见 face.draw_mouth；特效见 fx.FX。
+"""
+
+# (左眉 dy, 左眉角度, 右眉 dy, 右眉角度)；角度为屏幕顺时针弧度
+BROWS = {
+    None:      (0, 0.0, 0, 0.0),
+    "curious": (-7, -0.16, -12, 0.12),
+    "up":      (-13, -0.06, -13, 0.06),
+    "high":    (-20, -0.10, -20, 0.10),
+    "v":       (6, 0.38, 6, -0.38),
+    "angry":   (9, 0.52, 9, -0.52),
+    "focus":   (6, 0.18, 6, -0.18),
+    "worried": (1, -0.32, 1, 0.32),
+    "sad":     (2, -0.46, 2, 0.46),
+    "flat":    (0, -0.05, 0, 0.05),
+    "soft":    (-5, -0.12, -5, 0.12),
+    "think":   (10, 0.38, -9, -0.10),
+    "raised":  (-17, -0.14, 5, 0.12),
+}
+
+EXPRESSIONS = {
+    # ---- 素材图里的 11 种
+    "neutral":    dict(eyes=("rect", 24, 50), brows=None, mouth=None, blush=0.0,
+                       desc="平静 / 默认"),
+    "happy":      dict(eyes=("caret",), brows=None, mouth="smile", blush=1.0, desc="开心"),
+    "curious":    dict(eyes=("rect", 25, 54), brows="curious", mouth="dot", blush=0.0, desc="好奇"),
+    "think":      dict(eyes=("think",), brows="think", mouth=None, blush=0.0, front="think",
+                       desc="思考（手托下巴）"),
+    "surprised":  dict(eyes=("rect", 29, 66), brows="up", mouth="o", blush=0.0, desc="惊讶"),
+    "determined": dict(eyes=("rect", 25, 42), brows="v", mouth="smirk", blush=0.0, fx=("sparkle",),
+                       front="fists", desc="下定决心（握拳 + 闪光）"),
+    "tired":      dict(eyes=("small",), brows="worried", mouth="o_small", blush=0.0, desc="疲惫"),
+    "sleep":      dict(eyes=("closed",), brows=None, mouth="tiny", blush=1.0, fx=("zzz",), desc="睡觉"),
+    "yawn":       dict(eyes=("closed",), brows="flat", mouth="yawn", blush=1.0, desc="打哈欠"),
+    "proud":      dict(eyes=("caret",), brows="flat", mouth="curve", blush=1.0, desc="自豪 / 满足"),
+    "excited":    dict(eyes=("rect", 29, 66), brows="up", mouth="smile_big", blush=1.0, desc="兴奋"),
+    # ---- 扩展：正面情绪
+    "smile":      dict(eyes=("rect", 25, 52), brows="soft", mouth="curve", blush=0.6, desc="微笑"),
+    "grin":       dict(eyes=("caret",), brows="soft", mouth="grin", blush=0.8, desc="咧嘴笑"),
+    "laugh":      dict(eyes=("x",), brows="soft", mouth="laugh", blush=1.0, fx=("tears_joy",),
+                       desc="大笑（笑出眼泪）"),
+    "love":       dict(eyes=("heart",), brows=None, mouth="smile", blush=1.0, fx=("heart",), desc="喜爱"),
+    "starry":     dict(eyes=("star",), brows="up", mouth="smile_big", blush=1.0, fx=("sparkles",),
+                       desc="星星眼 / 崇拜"),
+    "awe":        dict(eyes=("shine", 30, 66), brows="high", mouth="o_small", blush=0.5,
+                       fx=("sparkles",), desc="惊叹（眼里有光）"),
+    "wink":       dict(eyes=("wink", 25, 54), brows="curious", mouth="smile", blush=1.0, desc="眨眼"),
+    "cheeky":     dict(eyes=("wink", 25, 54), brows="soft", mouth="cat", blush=0.8, desc="调皮"),
+    "relieved":   dict(eyes=("closed",), brows="soft", mouth="smile_small", blush=0.6, fx=("puff",),
+                       desc="松了口气"),
+    "fired_up":   dict(eyes=("rect", 26, 44), brows="angry", mouth="grin", blush=0.3, fx=("flame",),
+                       desc="斗志燃烧"),
+    "smug":       dict(eyes=("half", 25, 50, 0.45, 0.12), brows="raised", mouth="smirk", blush=0.3,
+                       desc="得意"),
+    # ---- 扩展：思考 / 中性
+    "focused":    dict(eyes=("half", 24, 50, 0.28, 0.0), brows="focus", mouth="flat", blush=0.0,
+                       desc="专注"),
+    "hmm":        dict(eyes=("rect", 24, 46), brows="think", mouth="side", blush=0.0, fx=("ellipsis",),
+                       desc="嗯……（琢磨）"),
+    "confused":   dict(eyes=("rect", 24, 48), brows="raised", mouth="side", blush=0.0, fx=("question",),
+                       desc="困惑"),
+    "skeptical":  dict(eyes=("half_l", 24, 50, 0.42), brows="raised", mouth="flat", blush=0.0,
+                       desc="怀疑"),
+    "deadpan":    dict(eyes=("dot",), brows=None, mouth="flat", blush=0.0, desc="面无表情"),
+    "sleepy":     dict(eyes=("half", 24, 50, 0.62, -0.05), brows="flat", mouth="tiny", blush=0.4,
+                       desc="困"),
+    # ---- 扩展：负面 / 紧张
+    "sad":        dict(eyes=("rect", 24, 38), brows="worried", mouth="frown", blush=0.0, desc="难过"),
+    "cry":        dict(eyes=("sad_closed",), brows="sad", mouth="open_frown", blush=0.4, fx=("tears",),
+                       desc="哭"),
+    "moved":      dict(eyes=("teary", 27, 56), brows="sad", mouth="wavy", blush=0.7, desc="感动 / 泪汪汪"),
+    "worried":    dict(eyes=("rect", 23, 46), brows="worried", mouth="wavy", blush=0.0, desc="担心"),
+    "nervous":    dict(eyes=("rect", 22, 44), brows="sad", mouth="wavy", blush=0.2, fx=("drops",),
+                       desc="紧张（冒汗）"),
+    "embarrassed": dict(eyes=("rect", 23, 42), brows="worried", mouth="wavy", blush=1.0,
+                        fx=("blush_lines", "sweat"), desc="尴尬 / 害羞"),
+    "shock":      dict(eyes=("rect", 30, 70), brows="high", mouth="o_big", blush=0.0, fx=("shock",),
+                       desc="震惊"),
+    "scared":     dict(eyes=("wide",), brows="sad", mouth="o_wide", blush=0.0, fx=("shock", "drops"),
+                       desc="惊恐"),
+    "angry":      dict(eyes=("rect", 26, 40), brows="angry", mouth="teeth", blush=0.0, fx=("anger",),
+                       desc="生气"),
+    "pout":       dict(eyes=("rect", 24, 44), brows="v", mouth="pout", blush=0.9, desc="嘟嘴 / 不服"),
+    "dizzy":      dict(eyes=("spiral",), brows="worried", mouth="wavy", blush=0.0, fx=("dizzy",),
+                       desc="晕头转向"),
+    "ko":         dict(eyes=("cross",), brows=None, mouth="o_small", blush=0.0, fx=("dizzy",),
+                       desc="被撞晕"),
+    "gloomy":     dict(eyes=("half", 24, 46, 0.5, -0.1), brows="sad", mouth="frown", blush=0.0,
+                       fx=("gloom",), desc="郁闷"),
+    # ---- 扩展（《星火》新增）：沉静 / 敬畏 / 感怀
+    "solemn":     dict(eyes=("half", 24, 48, 0.32, 0.0), brows="flat", mouth="flat", blush=0.0,
+                       desc="肃穆"),
+    "wonder":     dict(eyes=("shine", 28, 62), brows="up", mouth="o_small", blush=0.3,
+                       desc="入神（不带特效的惊叹）"),
+    "grateful":   dict(eyes=("closed",), brows="soft", mouth="smile_small", blush=0.9, desc="感激"),
+    "teary_smile": dict(eyes=("teary", 27, 56), brows="soft", mouth="curve", blush=0.8, desc="含泪微笑"),
+    "resolute":   dict(eyes=("rect", 25, 46), brows="focus", mouth="smile_small", blush=0.2, desc="坚定"),
+    "gaze":       dict(eyes=("rect", 22, 40), brows="soft", mouth=None, blush=0.2, desc="凝望远方"),
+}
+
+# 素材图原有的 11 种（导出总览时排在前面）
+ORIGINAL = ["neutral", "happy", "curious", "think", "surprised", "determined",
+            "tired", "sleep", "yawn", "proud", "excited"]
