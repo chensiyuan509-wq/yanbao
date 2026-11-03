@@ -21,7 +21,7 @@ description: 用 Python/pycairo 代码生成"星火风格"的电影感科普 / �
 | 找图、核对授权、看现有 89 张图各适合干什么 | `references/archive-library.md` |
 | Claude 怎么出场、表情 / 动作 / 服装 / 道具 | `references/claude-character.md` |
 | 函数签名、场景模块约定、渲染命令、**踩过的坑** | `references/engine-api.md` |
-| 发 YouTube（1080p、章节时间戳、封面、SRT）和 Instagram（9:16 竖版 Reels） | `references/publishing.md` |
+| 发布：Instagram 竖版 Reels 怎么切；YouTube / 邮件交给哪个技能 | `references/publishing.md` |
 | 看完整实现（每种构图都有现成代码） | `examples/xinghuo/scenes/*.py` 和 `examples/xinghuo/README.md` |
 
 开工前至少读 style-bible、camera-and-transitions、narrative-and-density 三份；写到具体镜头时再翻对应示例。
@@ -80,9 +80,9 @@ python ~/.claude/skills/xinghuo-style-video/scripts/contact_sheet.py sheet.jpg o
   - 出全片联系表：`contact_sheet.py sheet.jpg --video out/<slug>_480p.mp4 --every 16`，最后看一遍整体。
 - 更新项目 README：分镜表、"片中事实与说法"（说法 | 依据）、图像来源。
 - 发布物料（见 `references/publishing.md`）：`python render.py --res 1080` 出上传版；
-  `export_social.py youtube` 出章节时间戳、SRT、封面；`export_social.py reels --chapter N` 出 Instagram 竖版片段。
-- 用户常要邮件版：`bash ~/.claude/skills/xinghuo-style-video/scripts/mail_version.sh 18`（Gmail 附件 ≤ 25 MB）。
-  **提交 git、推送、发邮件都只在用户要求时做**；发邮件的方式见记忆里的 gmail-sending。
+  `scripts/export_reels.py --chapter N` 出 Instagram 竖版片段；YouTube 的上传物料与上传交给 **youtube-publish** 技能。
+- 发到邮箱看效果交给 **gmail-send** 技能（先 `python render.py --grain 0` 出无颗粒版，它会压到 25 MB 以内再发）。
+  **提交 git、推送、发邮件、上传 YouTube 都只在用户要求时做。**
 
 ## 质量线（用户明确否定过的东西）
 
@@ -101,5 +101,5 @@ python ~/.claude/skills/xinghuo-style-video/scripts/contact_sheet.py sheet.jpg o
   若在某个项目里改进了引擎（新转场、新构图、新音效），确认稳定后同步回 `engine/`，并在对应参考文档里补一行。
 - `templates/`：序章、章节、尾声模板（`__占位符__` 由脚手架替换）。
 - `examples/xinghuo/`：《星火》全部 10 个场景源码 + README（分镜、事实出处表）。
-- `scripts/`：`new_project.py` 建项目、`commons_search.py` 搜图、`contact_sheet.py` 联系表、`mail_version.sh` 邮件版、
-  `export_social.py` YouTube / Instagram 发布物料。
+- `scripts/`：`new_project.py` 建项目、`commons_search.py` 搜图、`contact_sheet.py` 联系表、`export_reels.py` Instagram 竖版。
+- 相关技能：**gmail-send**（发邮箱）、**youtube-publish**（YouTube 物料与上传）。

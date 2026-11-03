@@ -74,7 +74,7 @@ python render.py --sheet 5              # 每 5 秒一帧的联系表
 python render.py --start 128 --end 182  # 只渲染一段
 python render.py                        # 完整 480p → out/<SLUG>_480p.mp4（8 分钟约 2.5 分钟，8 核）
 python render.py --res 720 / 1080
-bash <skill>/scripts/mail_version.sh 18 # 邮件版（≈18 MB）
+python render.py --grain 0 --out out/<SLUG>_480p_nograin.mp4   # 邮件版的源（交给 gmail-send 压缩发送）
 ```
 全片时间 = 场景起点 + 本地时间；起点用 `python -c "from aivid.timeline import STARTS, NAMES; print(list(zip(NAMES, STARTS)))"` 查。
 
