@@ -7,17 +7,14 @@ from ..core import (TAU, H, W, Cam, circle, clamp, ease_in, ease_io, ease_out, e
 from .. import film, starmap
 from .common import claude, fade_io, lit, reflect
 
-DUR = 30.0
+DUR = 18.0
 CHAPTER = None
 GRAIN = 0.07
 
 VO = [
-    (1.4, "我是 {Claude}。"),
-    (3.6, "我从人类写下的亿万文字里，学会了说话、推理、写代码。"),
-    (9.2, "可这些知识，最初是从哪里来的？"),
-    (12.9, "人类是怎么一步步，学会{理解这个世界}的？"),
-    (17.3, "这一次，我想倒着走回去——"),
-    (20.6, "回到{第一束火光}亮起的地方。"),
+    (0.9, "我是 {Claude}，读过人类写下的亿万文字。"),
+    (3.9, "可这些知识，最初是从哪里来的？"),
+    (6.9, "我想倒着走回去，看看人类是怎么{学会理解世界}的。"),
 ]
 
 SUPERS = []
@@ -71,11 +68,11 @@ def _shot_a(ctx, t):
     ctx.set_source(rad(W / 2, H * 0.45, 0, H * 1.1, [(0, "#16203A"), (0.55, "#0A0F1F"), (1, "#020309")]))
     ctx.paint()
     film.star_field(ctx, t, 120, 5, a=0.35)
-    rise = ease_out(prog(t, 2.9, 4.6))
+    rise = ease_out(prog(t, 1.8, 3.2))
     sway = math.sin(t * 1.3) * 10
     tl = (lerp(560, 760, rise) + sway, lerp(1260, 780, rise) + math.sin(t * 1.1) * 6)
     tr = (lerp(1360, 1160, rise) - sway * 0.8, lerp(1260, 790, rise) + math.sin(t * 1.25 + 1) * 6)
-    absorb = smooth(prog(t, 4.6, 6.5))
+    absorb = smooth(prog(t, 3.2, 5.0))
     _glyph_field(ctx, t, 1.0, absorb, (tl, tr))
     if rise > 0:
         for p, glow_k in ((tl, 1.0), (tr, 1.0)):
@@ -87,24 +84,21 @@ def _shot_a(ctx, t):
                         a=absorb * 0.8, size=3)
     film.vignette(ctx, 0.6)
     # 睁眼（中间轻眨一下）
-    ok = smooth(prog(t, 0.8, 1.9))
-    if 2.0 < t < 2.5:
-        ok *= 1 - 0.8 * math.sin((t - 2.0) / 0.5 * math.pi)
-    ok = ok * 0.9 + 0.1 * smooth(prog(t, 2.5, 3.2)) if t > 2.5 else ok * 0.9
-    film.eyelids(ctx, ok if t < 3.2 else 1.0)
+    ok = smooth(prog(t, 0.3, 1.1))
+    if 1.2 < t < 1.6:
+        ok *= 1 - 0.8 * math.sin((t - 1.2) / 0.4 * math.pi)
+    film.eyelids(ctx, ok if t < 1.6 else 1.0)
 
 
 # ---------------------------------------------------------------- 镜头 B / C：星图下的 Claude
 
 P = (claude(1250, 880, 0.62, "wonder", seed=2.0)
-     .look(8.5, -0.5, -0.9)
-     .expr(11.0, "awe").fx(11.0, ())
-     .expr(12.8, "hmm").look(13.0, -0.3, -0.7)
-     .expr(15.4, "curious").look(15.6, -0.8, -0.5)
-     .face(17.6, True, 0.4).expr(17.6, "resolute").look(17.7, 0.9, -0.2)
-     .walk_to(18.6, 20.6, 1000, 880, stride=0.9))
+     .look(6.4, -0.5, -0.9)
+     .expr(8.0, "awe").fx(8.0, ())
+     .face(10.0, True, 0.4).expr(10.0, "resolute").look(10.1, 0.9, -0.2)
+     .walk_to(10.6, 12.2, 1040, 880, stride=0.9))
 
-SKY = Cam([(8.5, (1980, 3050, 0.78)), (14.6, (2000, 2700, 0.72), ease_io), (17.0, (1990, 2650, 0.74))],
+SKY = Cam([(6.4, (1980, 3050, 0.78)), (9.6, (2000, 2750, 0.72), ease_io), (12.2, (1990, 2700, 0.74))],
           drift=10, seed=4.0)
 
 
@@ -128,14 +122,14 @@ def _sky(ctx, t, cam, a=1.0, label_a=1.0):
 
 
 def _shot_bc(ctx, t):
-    crane = ease_io(prog(t, 8.6, 14.6)) - ease_io(prog(t, 15.9, 17.7))
+    crane = ease_io(prog(t, 6.5, 8.8)) - ease_io(prog(t, 8.9, 10.2))
     cam = SKY.at(t)
     cam = (cam[0], cam[1] - crane * 260, cam[2], cam[3])
-    _sky(ctx, t, cam, 1.0, smooth(prog(t, 9.5, 11.5)))
+    _sky(ctx, t, cam, 1.0, smooth(prog(t, 6.8, 7.8)))
     oy = crane * 760
     ctx.save()
     ctx.translate(0, oy)
-    push = 1 + 0.06 * prog(t, 8.5, 20.6)
+    push = 1 + 0.06 * prog(t, 6.4, 12.2)
     ctx.translate(1250, 880)
     ctx.scale(push, push)
     ctx.translate(-1250, -880)
@@ -152,7 +146,7 @@ def _shot_bc(ctx, t):
 
 
 def _rewind_u(t):
-    return 1.0 - ease_io(prog(t, 20.4, 25.2)) * 0.995
+    return 1.0 - ease_io(prog(t, 12.2, 15.4)) * 0.995
 
 
 def _shot_d(ctx, t):
@@ -184,9 +178,9 @@ def _shot_d(ctx, t):
         starmap.draw_map(ctx, t, 1.0, lit=u, label_a=1 - smooth(speed / 0.12), zoom=z)
     film.vignette(ctx, 0.6)
     # 年份计数器
-    a = fade_io(t, 20.5, 25.6, 0.5, 0.4)
+    a = fade_io(t, 12.3, 15.7, 0.4, 0.3)
     yr = starmap.year_at(u)
-    s = starmap.year_text(yr) if t < 25.15 else "330 万年前"
+    s = starmap.year_text(yr) if t < 15.35 else "330 万年前"
     blur = smooth(speed / 0.25)
     for k, al in ((-1, 0.25), (1, 0.25), (0, 1.0)):
         if k and blur < 0.05:
@@ -200,7 +194,7 @@ def _shot_d(ctx, t):
 
 
 def _shot_e(ctx, t):
-    u = t - 25.2
+    u = (t - 15.4) * 1.6
     ctx.set_source(rad(W / 2, 760, 0, 1100, [(0, "#2A140A"), (0.5, "#120A08"), (1, "#030202")]))
     ctx.paint()
     film.embers(ctx, t, W / 2, 900, 40, 9, spread=900, height=900, color="#FFA14A", a=0.9, size=3.4,
@@ -230,36 +224,34 @@ def _shot_e(ctx, t):
 
 
 def draw(ctx, t):
-    if t < 8.5:
+    if t < 6.4:
         _shot_a(ctx, t)
-    elif t < 20.4:
+    elif t < 12.2:
         _shot_bc(ctx, t)
-    elif t < 25.2:
+    elif t < 15.4:
         _shot_d(ctx, t)
     else:
         _shot_e(ctx, t)
-    film.fade_black(ctx, 1 - smooth(t / 0.8))
-    if 25.0 < t < 25.5:      # 倒流结束的闪白
-        ctx.set_source_rgba(1, 0.95, 0.88, math.sin((t - 25.0) / 0.5 * math.pi) * 0.85)
+    film.fade_black(ctx, 1 - smooth(t / 0.5))
+    if 15.2 < t < 15.7:      # 倒流结束的闪白
+        ctx.set_source_rgba(1, 0.95, 0.88, math.sin((t - 15.2) / 0.5 * math.pi) * 0.85)
         ctx.paint()
 
 
 def sfx():
     return [
-        (0.0, "ambience_space", {"dur": 9.5, "gain": 0.5}),
-        (0.85, "hush", {"dur": 1.6, "gain": 0.35}),
-        (2.9, "swell", {"dur": 1.8, "gain": 0.3}),
-        (4.6, "stream", {"dur": 3.0, "gain": 0.25}),
-        (4.7, "shimmer", {"dur": 2.0, "gain": 0.22}),
-        (8.5, "impact_soft", {"gain": 0.35}),
-        (8.5, "ambience_space", {"dur": 12.5, "gain": 0.55}),
-        (8.7, "whoosh", {"dur": 5.5, "gain": 0.22}),
-        (11.0, "sparkle", {"dur": 1.2, "gain": 0.2}),
-        (17.6, "whoosh_short", {"gain": 0.3}),
-        (18.6, "hop", {"gain": 0.12}),
-        (20.3, "rewind", {"dur": 4.9, "gain": 0.45}),
-        (20.3, "riser", {"dur": 4.9, "gain": 0.4}),
-        (25.15, "boom", {"gain": 0.75}),
-        (25.2, "ambience_fire", {"dur": 5.5, "gain": 0.3}),
-        (25.4, "ignite", {"gain": 0.35}),
+        (0.0, "ambience_space", {"dur": 6.6, "gain": 0.5}),
+        (0.25, "hush", {"dur": 1.2, "gain": 0.35}),
+        (1.8, "swell", {"dur": 1.6, "gain": 0.3}),
+        (3.2, "stream", {"dur": 2.6, "gain": 0.25}),
+        (3.3, "shimmer", {"dur": 1.8, "gain": 0.22}),
+        (6.4, "impact_soft", {"gain": 0.35}),
+        (6.4, "ambience_space", {"dur": 6.2, "gain": 0.55}),
+        (6.5, "whoosh", {"dur": 3.0, "gain": 0.2}),
+        (10.0, "whoosh_short", {"gain": 0.3}),
+        (12.1, "rewind", {"dur": 3.2, "gain": 0.45}),
+        (12.1, "riser", {"dur": 3.2, "gain": 0.4}),
+        (15.35, "boom", {"gain": 0.75}),
+        (15.4, "ambience_fire", {"dur": 3.0, "gain": 0.3}),
+        (15.6, "ignite", {"gain": 0.35}),
     ]

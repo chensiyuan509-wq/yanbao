@@ -180,13 +180,14 @@ def draw_chapter(ctx, T):
         if a <= 0.003:
             continue
         cy = ch.get("y", 500)
+        cx = ch.get("x", W / 2)
         # 压暗背景，保证字清楚
-        ctx.set_source(rad(W / 2, cy, 0, 760, [(0, "#000000", 0.55 * a), (0.6, "#000000", 0.25 * a),
+        ctx.set_source(rad(cx, cy, 0, 760, [(0, "#000000", 0.55 * a), (0.6, "#000000", 0.25 * a),
                                                (1, "#000000", 0)]))
         ctx.paint()
         tr = 0.10 + 0.08 * ease_io(u / dur)                       # 字距缓慢拉开
         num_a = a * smooth((u - 0.1) / 0.8)
-        _tracked(ctx, ch["num"], W / 2, cy - 112, 34, "#D9B26A", num_a, "serif_m", 0.6)
+        _tracked(ctx, ch["num"], cx, cy - 112, 34, "#D9B26A", num_a, "serif_m", 0.6)
         # 主标题：先虚后实（几层错位叠加模拟失焦 → 合焦）
         foc = ease_out(clamp((u - 0.2) / 1.1))
         for k, (dx, al) in enumerate(((0, 1.0), (-6, 0.25), (6, 0.25))):
@@ -195,19 +196,19 @@ def draw_chapter(ctx, T):
                 continue
             ctx.save()
             ctx.translate(off, 0)
-            _tracked(ctx, ch["title"], W / 2, cy - 18, 118, "#F4ECDF",
+            _tracked(ctx, ch["title"], cx, cy - 18, 118, "#F4ECDF",
                      a * al * (0.35 + 0.65 * foc) if k == 0 else a * al * (1 - foc), "serif_k", tr)
             ctx.restore()
         # 金色细线
         lw = 420 * ease_io(clamp((u - 0.6) / 1.0))
-        ctx.rectangle(W / 2 - lw / 2, cy + 62, lw, 2)
+        ctx.rectangle(cx - lw / 2, cy + 62, lw, 2)
         setc(ctx, "#D9B26A", 0.85 * a)
         ctx.fill()
         ea = a * smooth((u - 1.0) / 0.8)
-        _tracked(ctx, ch["era"], W / 2, cy + 108, 32, "#E8DCC8", ea, "serif_l", 0.12)
+        _tracked(ctx, ch["era"], cx, cy + 108, 32, "#E8DCC8", ea, "serif_l", 0.12)
         if ch.get("key"):
             ka = a * smooth((u - 1.6) / 0.8)
-            _tracked(ctx, "关键词 · " + ch["key"], W / 2, cy + 162, 28, "#D9B26A", ka, "serif_m", 0.3)
+            _tracked(ctx, "关键词 · " + ch["key"], cx, cy + 162, 28, "#D9B26A", ka, "serif_m", 0.3)
 
 
 # ---------------------------------------------------------------- 年代 / 地点字幕（左上角，打字机效果）

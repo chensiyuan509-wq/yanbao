@@ -46,7 +46,7 @@ def _win(t, t0, t1, fin=0.2, fout=0.2):
 
 class Actor:
     def __init__(self, x, y, s=1.0, expr="neutral", seed=0.0, flip=False, hat=None, glasses=None,
-                 idle=True):
+                 idle=True, costume=None, palette=None):
         self.pos = [(-99.0, (float(x), float(y)))]
         self.sc = [(-99.0, s)]
         self.ex = [(-99.0, expr)]
@@ -62,6 +62,8 @@ class Actor:
         self.front_k = [(-99.0, None)]
         self.prop_k = [(-99.0, (None, "front", 0.0))]
         self.hat_k = [(-99.0, hat)]
+        self.costume_k = [(-99.0, costume)]
+        self.palette = palette
         self.gl_k = [(-99.0, glasses)]
         self.flip_k = [(-99.0, flip)]
         self.walks = []           # (t0, t1, stride, run, inplace)
@@ -214,6 +216,12 @@ class Actor:
         self.prop_k.sort(key=lambda k: k[0])
         if cur[1] in ("front", "over"):
             self.front(t, None)
+        return self
+
+    def costume(self, t, name):
+        """换装（扮演历史人物）：name 为 costume.COSTUMES 里的预设或图层列表。"""
+        self.costume_k.append((t, name))
+        self.costume_k.sort(key=lambda k: k[0])
         return self
 
     def hat(self, t, name):
@@ -563,7 +571,8 @@ class Actor:
                     walk=walk, stride=stride, dust=1.0 if run else 0.0, talk=talk, talk_smile=smile,
                     fx=fx, front=front or None, clap=clap, flip=flip_now, spin=spin, sit=sit,
                     alpha=alpha, eye_open=eye_open, brow_lift=brow_lift, hat=hat, glasses=glasses,
-                    prop=prop, prop_at=at, prop_k=prop_k, prop_rot=prot)
+                    prop=prop, prop_at=at, prop_k=prop_k, prop_rot=prot,
+                    costume=_step(self.costume_k, t)[0], palette=self.palette)
 
     def _hat_motion(self, t, st):
         """帽子的惯性：起跳时被压住，腾空时轻轻飘起，落地时一沉。"""

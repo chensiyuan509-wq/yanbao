@@ -225,6 +225,20 @@ def composite(ctx, kind, p, sa, sb, pw, ph, params):
     elif kind == "match":
         _match(ctx, p, sa, sb, pw, ph, k, params)
 
+    elif kind == "zoomblur":
+        _zoomblur(ctx, p, sa, sb, pw, ph, k, params)
+
+    elif kind == "lightsweep":
+        _lightsweep(ctx, p, sa, sb, pw, ph, k, params)
+
+    elif kind == "luma":
+        _luma(ctx, p, sa, sb, pw, ph, params)
+
+    elif kind == "dissolve":
+        z = params.get("zoom", 0.04)
+        _paint(ctx, sa, pw, ph, 1.0, 1 + z * p)
+        _paint(ctx, sb, pw, ph, smooth(p), 1 + z * (p - 1))
+
     else:
         _paint(ctx, sb if p >= 0.5 else sa, pw, ph)
     ctx.restore()
@@ -455,6 +469,90 @@ def _match(ctx, p, sa, sb, pw, ph, k, params):
 
     draw(sa, (ax, ay), sA, 1.0)
     draw(sb, (bx, by), sB, fa)
+
+
+def _zoomblur(ctx, p, sa, sb, pw, ph, k, params):
+    """变焦模糊：镜头猛地推进 A（径向拖影），在最快处换成 B，B 从拖影里稳住。"""
+    cx, cy = params.get("x", 960) * k, params.get("y", 540) * k
+    n = 8
+    if p < 0.5:
+        q = ease_in(p * 2)
+        base = 1 + 0.9 * q
+        for i in range(n):
+            f = i / (n - 1)
+            _paint(ctx, sa, pw, ph, 1.0 if i == 0 else 0.22 * q, base * (1 + 0.35 * q * f), cx=cx, cy=cy)
+        ctx.set_source_rgba(1, 0.97, 0.92, 0.25 * q)
+        ctx.paint()
+    else:
+        q = 1 - ease_out((p - 0.5) * 2)
+        base = 1 + 0.5 * q
+        for i in range(n):
+            f = i / (n - 1)
+            _paint(ctx, sb, pw, ph, 1.0 if i == 0 else 0.22 * q, base * (1 + 0.35 * q * f), cx=cx, cy=cy)
+        ctx.set_source_rgba(1, 0.97, 0.92, 0.25 * q)
+        ctx.paint()
+
+
+def _lightsweep(ctx, p, sa, sb, pw, ph, k, params):
+    """光带扫过：一道带辉光的斜向光带掠过画面，光带后面是新画面。"""
+    ang = params.get("angle", -0.5)
+    col = hexc(params.get("color", "#FFE6B8"))
+    e = ease_io(p)
+    ux, uy = math.cos(ang), math.sin(ang)
+    L = abs(pw * ux) + abs(ph * uy)
+    s = -L / 2 - 200 * k + (L + 400 * k) * e
+    cx, cy = pw / 2, ph / 2
+    _paint(ctx, sa, pw, ph, 1.0, 1 + 0.03 * p)
+    soft = 90 * k
+    g = cairo.LinearGradient(cx + ux * (s - soft), cy + uy * (s - soft), cx + ux * (s + soft), cy + uy * (s + soft))
+    g.add_color_stop_rgba(0, 0, 0, 0, 1)
+    g.add_color_stop_rgba(1, 0, 0, 0, 0)
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.scale(1.03 - 0.03 * p, 1.03 - 0.03 * p)
+    ctx.translate(-cx, -cy)
+    ctx.set_source_surface(sb, 0, 0)
+    ctx.mask(g)
+    ctx.restore()
+    f = math.sin(math.pi * p)
+    ctx.save()
+    ctx.set_operator(cairo.OPERATOR_ADD)
+    for w, a in ((260, 0.25), (90, 0.45), (22, 0.9)):
+        g2 = cairo.LinearGradient(cx + ux * (s - w * k), cy + uy * (s - w * k), cx + ux * (s + w * k), cy + uy * (s + w * k))
+        g2.add_color_stop_rgba(0, *col, 0)
+        g2.add_color_stop_rgba(0.5, *col, a * f)
+        g2.add_color_stop_rgba(1, *col, 0)
+        ctx.set_source(g2)
+        ctx.paint()
+    ctx.restore()
+
+
+def _lum(surf, pw, ph, step=2):
+    surf.flush()
+    stride = surf.get_stride()
+    buf = np.ndarray((ph, stride // 4, 4), dtype=np.uint8, buffer=surf.get_data())[:ph, :pw]
+    sub = buf[::step, ::step, :3].astype(np.float32)
+    return (0.11 * sub[..., 0] + 0.59 * sub[..., 1] + 0.3 * sub[..., 2]) / 255.0
+
+
+def _luma(ctx, p, sa, sb, pw, ph, params):
+    """亮度溶解：新画面从最亮的地方先显现，像胶片冲洗时影像慢慢浮出来。"""
+    step = 2
+    lum = _lum(sb, pw, ph, step)
+    th = 1.15 - 1.3 * ease_io(p)
+    m = np.clip((lum - th) / 0.18, 0, 1)
+    mh, mw = m.shape
+    mask = _a8((m * 255).astype(np.uint8))
+    _paint(ctx, sa, pw, ph, 1.0, 1 + 0.03 * p)
+    ctx.save()
+    ctx.set_source_surface(sb, 0, 0)
+    ms = cairo.SurfacePattern(mask)
+    mt = cairo.Matrix()
+    mt.scale(1 / step, 1 / step)
+    ms.set_matrix(mt)
+    ms.set_filter(cairo.FILTER_BILINEAR)
+    ctx.mask(ms)
+    ctx.restore()
 
 
 def _glitch(surf, p, seed):

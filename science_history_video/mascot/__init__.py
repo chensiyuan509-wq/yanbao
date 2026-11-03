@@ -15,7 +15,8 @@ from .expressions import BROWS, EXPRESSIONS, ORIGINAL
 from .fx import FX
 from .gear import GLASSES, HATS, PROPS, draw_prop
 from .gfx import set_color_hook
+from .costume import COSTUMES, PALETTES
 
 __all__ = ["Actor", "ACTIONS", "KEEP", "draw_mascot", "hand_point", "blink_open", "FRONT_POSES",
            "EXPRESSIONS", "ORIGINAL", "BROWS", "FX", "HATS", "GLASSES", "PROPS", "draw_prop",
-           "set_color_hook", "BW", "BH", "LEG_H", "TOP"]
+           "set_color_hook", "BW", "BH", "LEG_H", "TOP", "COSTUMES", "PALETTES"]

@@ -6,6 +6,7 @@ pose 的各项含义见 draw_mascot 的文档；通常由 Actor.state(t) 生成�
 import math
 import random
 
+from .costume import PALETTES, draw_layers
 from .const import (ARM_Y, BH, BLEND, BW, C_BODY_B, C_BODY_M, C_BODY_T, C_HL, C_LEG, C_LEG_D,
                     C_LEG_L, C_OUT, C_RIM, EYE_X, EYE_Y, BROW_Y, LEG_H, LEGS_X, TOP)
 from .expressions import BROWS, EXPRESSIONS
@@ -18,6 +19,9 @@ from .gfx import (TAU, circle, clamp, ease_back, ease_out, fill, lerp, lin, nois
 # ---------------------------------------------------------------- 自然眨眼
 
 _BLINK_CACHE = {}
+
+
+_PAL = dict(PALETTES["orange"])
 
 
 def _blink_times(seed):
@@ -96,7 +100,7 @@ def _bar(ctx, cx, cy, length, thick, ang, a=1.0):
     ctx.translate(cx, cy)
     ctx.rotate(ang)
     rrect(ctx, -length / 2, -thick / 2, length, thick, 10)
-    ctx.set_source(lin(0, -thick / 2, 0, thick / 2, [(0, "#F59A6E", a), (1, C_BODY_B, a)]))
+    ctx.set_source(lin(0, -thick / 2, 0, thick / 2, [(0, _PAL["arm"], a), (1, _PAL["b"], a)]))
     ctx.fill_preserve()
     ctx.set_line_width(4)
     setc(ctx, C_OUT, 0.9 * a)
@@ -138,10 +142,10 @@ def _stub(ctx, side, ang, ext=0.0):
     x0 = -12 if side > 0 else -(L + 8)
     w = L + 20
     rrect(ctx, x0 - 1, -24, w + 2, 47, 8)
-    setc(ctx, C_RIM, 0.95)
+    setc(ctx, _PAL["rim"], 0.95)
     ctx.fill()
     rrect(ctx, x0, -21, w, 44, 7)
-    ctx.set_source(lin(0, -21, 0, 23, [(0, "#EE8C62"), (1, C_BODY_B)]))
+    ctx.set_source(lin(0, -21, 0, 23, [(0, _PAL["arm"]), (1, _PAL["b"])]))
     ctx.fill()
     ctx.restore()
 
@@ -196,7 +200,8 @@ def draw_mascot(ctx, x, y, s=1.0, expr="neutral", t=0.0, since=10.0, prev=None, 
                 ext_r=0.0, front=None, clap=0.0, fx=None, fx_a=1.0, talk=0.0, talk_smile=0.0,
                 flip=False, spin=0.0, sit=0.0, lift=0.0, shadow=1.0, alpha=1.0, blink=True,
                 eye_open=1.0, seed=0.0, hat=None, hat_dy=0.0, hat_rot=0.0, glasses=None, prop=None,
-                prop_at="front", prop_k=1.0, prop_rot=0.0, dust=0.0, brow_lift=0.0, **_):
+                prop_at="front", prop_k=1.0, prop_rot=0.0, dust=0.0, brow_lift=0.0, costume=None, palette=None,
+                **_):
     """绘制角色。
 
     expr / since / prev：当前表情、距上次切换的秒数、上一个表情（用于平滑过渡）。
@@ -218,7 +223,7 @@ def draw_mascot(ctx, x, y, s=1.0, expr="neutral", t=0.0, since=10.0, prev=None, 
         _draw(ctx, x, y, s, expr, t, since, prev, look, squash, tilt, walk, stride, arm_l, arm_r, ext_l,
               ext_r, front, clap, fx, fx_a, talk, talk_smile, flip, spin, sit, lift, shadow, blink,
               eye_open, seed, hat, hat_dy, hat_rot, glasses, prop, prop_at, prop_k, prop_rot, dust,
-              brow_lift)
+              brow_lift, costume, palette)
     finally:
         if alpha < 0.999:
             ctx.pop_group_to_source()
@@ -228,7 +233,9 @@ def draw_mascot(ctx, x, y, s=1.0, expr="neutral", t=0.0, since=10.0, prev=None, 
 def _draw(ctx, x, y, s, expr, t, since, prev, look, squash, tilt, walk, stride, arm_l, arm_r, ext_l,
           ext_r, front, clap, fx, fx_a, talk, talk_smile, flip, spin, sit, lift, shadow, blink,
           eye_open, seed, hat, hat_dy, hat_rot, glasses, prop, prop_at, prop_k, prop_rot, dust,
-          brow_lift):
+          brow_lift, costume=None, palette=None):
+    _PAL.clear()
+    _PAL.update(PALETTES.get(palette or "orange", PALETTES["orange"]))
     if expr not in EXPRESSIONS:
         expr = "neutral"
     st = _blend_state(expr, since, prev if prev in EXPRESSIONS else expr)
@@ -281,7 +288,7 @@ def _draw(ctx, x, y, s, expr, t, since, prev, look, squash, tilt, walk, stride, 
         h = bottom - top
         if h > 1:
             rrect(ctx, lxx - 10, top, 20, h, 2.5)
-            ctx.set_source(lin(0, top, 0, bottom, [(0, C_LEG_D), (0.35, C_LEG), (1, "#B8664A")]))
+            ctx.set_source(lin(0, top, 0, bottom, [(0, C_LEG_D), (0.35, _PAL["leg"]), (1, _PAL["b"])]))
             ctx.fill()
             ctx.rectangle(lxx - 10, top + 12, 5, max(0, h - 13))
             setc(ctx, C_LEG_L, 0.8)
@@ -303,16 +310,18 @@ def _draw(ctx, x, y, s, expr, t, since, prev, look, squash, tilt, walk, stride, 
     _stub(ctx, 1, arm_r, ext_r)
 
     rrect(ctx, -BW / 2 + 1, TOP - 5, BW + 5, BH + 4, 13)
-    setc(ctx, C_RIM)
+    setc(ctx, _PAL["rim"])
     ctx.fill()
     rrect(ctx, -BW / 2, TOP, BW, BH, 12)
-    ctx.set_source(lin(0, TOP, 0, TOP + BH, [(0, C_BODY_T), (0.55, C_BODY_M), (1, C_BODY_B)]))
+    ctx.set_source(lin(0, TOP, 0, TOP + BH, [(0, _PAL["t"]), (0.55, _PAL["m"]), (1, _PAL["b"])]))
     ctx.fill_preserve()
     ctx.set_source(rad(-70, TOP + 30, 10, 270, [(0, "#FFFFFF", 0.12), (1, "#FFFFFF", 0)]))
     ctx.fill()
     rrect(ctx, -BW / 2 + 18, TOP + 8, 92, 11, 5.5)
     setc(ctx, C_HL, 0.8)
     ctx.fill()
+    if costume and show_face:
+        draw_layers(ctx, costume, t, 1.0, "under")
 
     # 前置手臂姿势（解析）
     poses = {}
@@ -355,6 +364,9 @@ def _draw(ctx, x, y, s, expr, t, since, prev, look, squash, tilt, walk, stride, 
         ctx.translate(0, -TOP)
         HATS[hat](ctx, t, 1.0)
         ctx.restore()
+
+    if costume:
+        draw_layers(ctx, costume, t, 1.0, "over")
 
     # 道具 + 前置手臂 -----------------------------------------------------
     if prop is not None and prop_k > 0.01:

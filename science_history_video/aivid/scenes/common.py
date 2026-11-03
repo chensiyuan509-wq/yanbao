@@ -75,3 +75,62 @@ def label(ctx, s, x, y, size=30, color="#F4E6C8", a=1.0, weight="serif_sb", sub=
 
 def counter_text(v, fmt="{:,.0f}"):
     return fmt.format(v)
+
+
+def role(x, y, s=0.6, costume=None, expr="neutral", seed=1.0, palette=None, **kw):
+    """Claude 扮演历史人物（换上对应的服装），palette 用来区分同框的不同角色。"""
+    return Actor(x, y, s, expr, seed=seed, costume=costume, palette=palette, **kw)
+
+
+def arch(ctx, t, key, t0, t1, c0, c1, title=None, sub="", grade=None, cap=(0.6, None), rect=None, a=1.0,
+         vig=0.5):
+    """档案镜头：历史图像缓缓推拉（Ken Burns）+ 暗角 + 左下角出处字幕。返回图像坐标→画面坐标的映射。"""
+    from ..archive import caption, kb
+    from .. import film
+    rect = rect or (0, 0, W, H)
+    to = kb(ctx, key, t, t0, t1, c0, c1, rect=rect, a=a, grade=grade)
+    if vig:
+        film.vignette(ctx, vig)
+    if title:
+        c0_, c1_ = cap
+        c1_ = c1_ if c1_ is not None else (t1 - t0) - 0.4
+        ca = smooth(clamp((t - t0 - c0_) / 0.6)) * smooth(clamp((t0 + c1_ - t) / 0.5))
+        caption(ctx, title, sub, ca * a)
+    return to
+
+
+def sequence(ctx, t, shots, trans=None):
+    """章内分镜 + 镜头之间的转场。
+
+    shots = [(开始秒, fn), ...]（fn(ctx, t) 画这个镜头）
+    trans = {镜头序号 j: (种类, 时长, 参数)} —— 第 j 个镜头开始时用什么转场（以交界为中心）
+    """
+    import cairo
+    from ..transitions import composite
+    trans = trans or {}
+    for j in range(1, len(shots)):
+        if j in trans:
+            kind, dur = trans[j][0], trans[j][1]
+            params = trans[j][2] if len(trans[j]) > 2 else {}
+            b = shots[j][0]
+            if b - dur / 2 <= t < b + dur / 2:
+                tgt = ctx.get_target()
+                pw, ph = tgt.get_width(), tgt.get_height()
+                m = ctx.get_matrix()
+                surfs = []
+                for fn in (shots[j - 1][1], shots[j][1]):
+                    s = cairo.ImageSurface(cairo.FORMAT_ARGB32, pw, ph)
+                    c = cairo.Context(s)
+                    c.set_source_rgb(0, 0, 0)
+                    c.paint()
+                    c.set_matrix(m)
+                    fn(c, t)
+                    s.flush()
+                    surfs.append(s)
+                composite(ctx, kind, (t - (b - dur / 2)) / dur, surfs[0], surfs[1], pw, ph, params)
+                return
+    idx = 0
+    for k, (t0, _) in enumerate(shots):
+        if t >= t0:
+            idx = k
+    shots[idx][1](ctx, t)
