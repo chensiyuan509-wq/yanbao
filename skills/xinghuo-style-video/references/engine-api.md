@@ -21,6 +21,9 @@ aivid/film.py         颗粒、遮幅、调色、暗角、光、火、烟、星�
 aivid/archive.py      历史图像：show / kb / framed / caption（多级缓存）
 aivid/gallery.py      博物馆长廊 Gallery
 aivid/exhibit.py      card / panel / blueprint_bg
+aivid/layout.py       版面网格 GRID、字号层级 TYPE、颜色 C、info_panel / headline / stat / tag / pointer / source_note / reveal
+aivid/diagram.py      node / edge（描出 + 流动光点）/ group / orbit；主题 blueprint / dark / paper（拜恩配色 BYRNE）
+aivid/codeview.py     code_panel（语法高亮、逐字打出、行高亮、聚焦）/ terminal
 aivid/proofs.py       Byrne 风格证明
 aivid/oldmap.py       Natural Earth + 卫星地图、MapCam、城市、航线
 aivid/starmap.py      《星火》专用的手形知识星图（新片可删或改 STARS）
@@ -61,6 +64,9 @@ def sfx(): return [(t, "音效名", {参数}), …]
   `film.dust` `film.smoke_puffs` `film.paint_texture(ctx, "parchment|clay|stone|paper", x, y, w, h, a)` `film.pov_arm` `film.eyelids`
 - 档案：`kb` `arch` `framed` `show(…, grade=, fit=)` `caption`
 - 展示：`card` `panel` `blueprint_bg` `Gallery`
+- 排版层级（优先用它们，层级和节奏自动一致）：`info_panel(ctx, t, t0, title, rows, conclusion, theme=)` `headline` `stat` `tag` `pointer` `source_note` `reveal(t, t0, i)`
+- 图解：`node(ctx, x, y, w, h, title, sub, k=, theme=, hot=, fill_color=)` `edge(ctx, p0, p1, p=, flow_t=t, curve=)` `group` `orbit`
+- 代码：`code_panel(ctx, t, t0, code, x, y, w, title, cps=, highlight=[(行, t0, t1)], focus=(a, b))` `terminal(ctx, t, t0, [("cmd", …), ("ok", …)])`
 - 地图：`MapCam(keys).at(t)` `cam.xy(lon, lat)` `draw_satellite` `sat_vignette` `city_sat` `route` `river_lines`
 - 角色：`claude()` `role()` `lit()` `reflect()`
 
@@ -73,6 +79,7 @@ python render.py --still 12 95.5 230    # 导出指定秒的 PNG → out/stills/
 python render.py --sheet 5              # 每 5 秒一帧的联系表
 python render.py --start 128 --end 182  # 只渲染一段
 python render.py                        # 完整 480p → out/<SLUG>_480p.mp4（8 分钟约 2.5 分钟，8 核）
+python <skill>/scripts/style_audit.py out/<SLUG>_480p.mp4 --project .   # 对照星火风格指纹
 python render.py --res 720 / 1080
 python render.py --grain 0 --out out/<SLUG>_480p_nograin.mp4   # 邮件版的源（交给 gmail-send 压缩发送）
 ```
